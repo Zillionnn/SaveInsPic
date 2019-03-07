@@ -5,10 +5,10 @@
         <StackLayout backgroundColor="#3c495e">
             <Label class="message" :text="msg" height="70" />
             <!-- <TextView :text="imgPositionStr" class="message"/> -->
-
-          
+            <Label class='message' :text="folderPath" textWrap="true"/>
+            <label class="message" :text="error" textWrap=  "true" />
             <!-- <Image src="https://www.nativescript.org/images/default-source/Blogs/ns-logo_share_600x315.png" stretch="aspectFill"  width="100" height="100"/> -->
-            <Image :src="imgRes" stretch="aspectFill"  width="200" height="200"/>
+            <Image :src="imgRes" stretch="aspectFill"  width="200" height="200" />
 
             <Button text="get clipboard" height="70" @tap="onButtonTap()"/>
             <Button text="clear clipboard" height="70" @tap="clearHis()"/>
@@ -28,6 +28,7 @@
 import * as Clipboard from "nativescript-clipboard";
 const httpModule = require("http");
 const imageSourceModule = require("tns-core-modules/image-source");
+const fileSystemModule = require("tns-core-modules/file-system");
 
 export default {
   data() {
@@ -36,7 +37,9 @@ export default {
       clipboardText: null,
       historyClipBoard: [],
       imgRes: null,
-      imgPositionStr: ""
+      imgPositionStr: "",
+      folderPath: "",
+      error: ""
     };
   },
   created() {},
@@ -70,11 +73,9 @@ export default {
               let result = tempStr.substr(0, tagEnd - 2);
 
               this.imgPositionStr = result;
+              console.log(result);
+              //this.imgRes = r;
               this.showInsImg(result);
-              // The toJSON method allows you to parse the received content to JSON object
-              // var obj = response.content.toJSON();
-              // The toImage method allows you to get the response body as ImageSource.
-              // var img = response.content.toImage();
             },
             e => {}
           );
@@ -82,17 +83,53 @@ export default {
     },
     showInsImg(url) {
       this.msg = "get the image...";
+      this.folderPath = "PATH";
       let insUrl = url.trim();
-      httpModule.getImage(insUrl).then(
-        r => {
+      httpModule
+        .getImage(insUrl)
+        .then(r => {
           // getImage method returns ImageSource object
           console.log(r);
           this.imgRes = r;
+          console.log(fileSystemModule.knownFolders);
+          //const folder = fileSystemModule.knownFolders.documents().path;
+
+          const folder = "/storage/emulated/0/saveInsImg";
+          this.folderPath = folder;
+          const fileName =`${insUrl.substr(20,insUrl.length)}.png`
+          console.log("fileName...", folder, fileName);
+          const path = fileSystemModule.path.join(folder, fileName);
+          console.log(path);
+          this.folderPath = this.folderPath + ";" + path;
+          const saved = r.saveToFile(path, "png");
+          this.folderPath = this.folderPath + ";" + saved;
+          if (saved) {
+            console.log("Image saved successfully!");
+          }
+
           this.msg = "done";
-        },
-        e => {}
-      );
+        })
+        .catch(err => {
+          {
+            this.error = err;
+          }
+        });
+
+      // const source = new imageSourceModule.ImageSource();
+      // console.log(source)
+      //           source.fromUrl(insUrl)
+      //           .then((imageSource) => {
+      //               const folder = fileSystemModule.knownFolders.documents().path;
+      //               const fileName = "test.png";
+      //               console.log('fileName...', fileName)
+      //               const path = fileSystemModule.path.join(folder, fileName);
+      //               const saved = imageSource.saveToFile(path, "png");
+      //               if (saved) {
+      //                   console.log("Image saved successfully!");
+      //               } },
+      //         e => {}      );
     },
+
     clearHis() {
       this.historyClipBoard = [];
     },
