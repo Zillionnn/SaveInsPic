@@ -5,6 +5,7 @@
         <StackLayout backgroundColor="#3c495e">
             <Label class="message" :text="msg" height="70" />
             <!-- <TextView :text="imgPositionStr" class="message"/> -->
+            <Label class="message" :text="imageName" textWrap="true" />
             <Label class='message' :text="folderPath" textWrap="true"/>
             <label class="message" :text="error" textWrap=  "true" />
             <!-- <Image src="https://www.nativescript.org/images/default-source/Blogs/ns-logo_share_600x315.png" stretch="aspectFill"  width="100" height="100"/> -->
@@ -39,8 +40,16 @@ export default {
       imgRes: null,
       imgPositionStr: "",
       folderPath: "",
-      error: ""
+      error: "",
+      imageName:'',
+      imgUrl: ''
     };
+  },
+  computed:{
+    boardLength(){
+      let l = this.historyClipBoard.length
+      return l
+    }
   },
   created() {},
   methods: {
@@ -81,53 +90,72 @@ export default {
           );
       });
     },
+    getImgName(){
+         
+      let y = new Date().getFullYear();
+      let m = new Date().getMonth()+1;
+      let date = new Date().getDate();
+      let h = new Date().getHours();
+      let min = new Date().getMinutes();
+      let s = new Date().getSeconds();
+      let name = `${y}${m}${date}${h}${min}${s}`
+      this.imageName = name
+      return name
+    },
     showInsImg(url) {
-      this.msg = "get the image...";
-      this.folderPath = "PATH";
-      let insUrl = url.trim();
-      httpModule
-        .getImage(insUrl)
-        .then(r => {
-          // getImage method returns ImageSource object
-          console.log(r);
-          this.imgRes = r;
-          console.log(fileSystemModule.knownFolders);
-          //const folder = fileSystemModule.knownFolders.documents().path;
+      let tempUrl = this.imgUrl
+      if(tempUrl !== url){
+          this.imgUrl = url
+          this.msg = "get the image...";
+          this.folderPath = "PATH";
+          let insUrl = url.trim();
+          httpModule
+            .getImage(insUrl)
+            .then(r => {
+              // getImage method returns ImageSource object
+              console.log(r);
+              this.imgRes = r;
+              console.log(fileSystemModule.knownFolders);
+              //const folder = fileSystemModule.knownFolders.documents().path;
 
-          const folder = "/storage/emulated/0/saveInsImg";
-          this.folderPath = folder;
-          const fileName =`${insUrl.substr(20,insUrl.length)}.png`
-          console.log("fileName...", folder, fileName);
-          const path = fileSystemModule.path.join(folder, fileName);
-          console.log(path);
-          this.folderPath = this.folderPath + ";" + path;
-          const saved = r.saveToFile(path, "png");
-          this.folderPath = this.folderPath + ";" + saved;
-          if (saved) {
-            console.log("Image saved successfully!");
-          }
+              const folder = "/storage/emulated/0/saveInsImg";
+              this.folderPath = folder;
 
-          this.msg = "done";
-        })
-        .catch(err => {
-          {
-            this.error = err;
-          }
-        });
+              let name  = this.getImgName()
+              const fileName =`${name}.png`
+              console.log("fileName...", folder, fileName);
+              const path = fileSystemModule.path.join(folder, fileName);
+              console.log(path);
+              this.folderPath = this.folderPath + ";" + path;
+              const saved = r.saveToFile(path, "png");
+              this.folderPath = this.folderPath + ";" + saved;
+              if (saved) {
+                console.log("Image saved successfully!");
+              }
 
-      // const source = new imageSourceModule.ImageSource();
-      // console.log(source)
-      //           source.fromUrl(insUrl)
-      //           .then((imageSource) => {
-      //               const folder = fileSystemModule.knownFolders.documents().path;
-      //               const fileName = "test.png";
-      //               console.log('fileName...', fileName)
-      //               const path = fileSystemModule.path.join(folder, fileName);
-      //               const saved = imageSource.saveToFile(path, "png");
-      //               if (saved) {
-      //                   console.log("Image saved successfully!");
-      //               } },
-      //         e => {}      );
+              this.msg = "done";
+            })
+            .catch(err => {
+              {
+                this.error = err;
+              }
+            });
+
+          // const source = new imageSourceModule.ImageSource();
+          // console.log(source)
+          //           source.fromUrl(insUrl)
+          //           .then((imageSource) => {
+          //               const folder = fileSystemModule.knownFolders.documents().path;
+          //               const fileName = "test.png";
+          //               console.log('fileName...', fileName)
+          //               const path = fileSystemModule.path.join(folder, fileName);
+          //               const saved = imageSource.saveToFile(path, "png");
+          //               if (saved) {
+          //                   console.log("Image saved successfully!");
+          //               } },
+          //         e => {}      );
+      }
+     
     },
 
     clearHis() {
@@ -135,6 +163,13 @@ export default {
     },
     onItemTap(content) {
       this.clipboardText = content;
+    }
+  },
+  watch:{
+    boardLength(val, oldVal){
+      if(val>0){
+       // this.onButtonTap()
+      }
     }
   }
 };
