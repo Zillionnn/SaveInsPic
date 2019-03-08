@@ -30,6 +30,7 @@ import * as Clipboard from 'nativescript-clipboard'
 const httpModule = require('http')
 const imageSourceModule = require('tns-core-modules/image-source')
 const fileSystemModule = require('tns-core-modules/file-system')
+const permissions = require( "nativescript-permissions" );
 
 export default {
 	data () {
@@ -51,7 +52,15 @@ export default {
 			return l
 		}
 	},
-	created () {},
+	created () {
+		permissions.requestPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, "I need these permissions because I'm cool")
+  .then(function() {
+     console.log("Woo Hoo, I have the power!");
+  })
+  .catch(function() {
+     console.log("Uh oh, no permissions - plan B time!");
+  });
+	},
 	methods: {
 		onButtonTap () {
 			Clipboard.getText().then(content => {
@@ -59,9 +68,7 @@ export default {
 				let insUrl = content
 				this.historyClipBoard.push(content)
 				this.msg = 'get html page'
-				let imgUrl =
-          'https://scontent-hkg3-2.cdninstagram.com/vp/8c071b8a600c99be856174d19c748d96/5D0FB087/t51.2885-15/e35/53219272_265808877682253_9167345377758443403_n.jpg?_nc_ht=scontent-hkg3-2.cdninstagram.com'
-				// this.showInsImg(imgUrl)
+
 				httpModule
 					.request({
 						url: insUrl,
