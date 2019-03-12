@@ -1,14 +1,22 @@
 <template>
   <Page >
-    <ActionBar title="Save Instagram Pic"/>
+    <ActionBar title="Save Instagram Pic">
+       <ActionItem @tap="downLoadPic" text="download pictures" 
+            ios.systemIcon="16" ios.position="right"
+            android.position="popup"></ActionItem>
+       <ActionItem @tap="clearHis" text="clear image list" 
+            ios.systemIcon="16" ios.position="right"
+            android.position="popup"></ActionItem>
+    </ActionBar>
     <AbsoluteLayout ref="rootLayout">
       <ListView
         for="item in imgUrlList"
         @itemTap="onItemTap"
-        left="10"
+        left="1.5%"
         top="10"
+        right="1.5%"
         height="97%"
-        width="100%"
+        width="98%"
         marginBottom="48"
       >
         <v-template>
@@ -16,23 +24,7 @@
             <Image :src="item" stretch="aspectFill" width="100%" height="auto"/>
           </StackLayout>
         </v-template>
-      </ListView>
-      <!-- <StackLayout left="0" top="0" height="100%" width="100%" class="backdrop" :class="classBackdrop" /> -->
-      <AbsoluteLayout ref="fabItemPosition" marginTop="87%" marginLeft="5%">
-				<Button text="CLEAR LIST" @tap="clearHis()"  left="10" top="0"  class="btn btn-primary btn-active" />
-				<Button text="DOWNLOAD IMAGES" @tap="downLoadPic()" left="150" top="0"  class="btn btn-primary btn-active" />
-        <!-- <GridLayout ref="fabItemContainer" left="8" top="8">
-          <FabItem row="1" :class="classItem1" color="#E94E77" title="CLEAR" @onButtonTap="clearHis()"/>
-          <FabItem
-            row="1"
-            :class="classItem2"
-            color="#3FB8AF"
-            title="DOWNLOAD"
-            @onButtonTap="downLoadPic()"
-          />
-        </GridLayout>
-        <FabButton @onButtonTap="onCroseeButtonTap" :isActive="isActive"/> -->
-      </AbsoluteLayout>
+      </ListView>     
     </AbsoluteLayout>
   </Page>
 </template>
@@ -67,7 +59,6 @@ export default {
       historyClipBoard: [],
       imgUrlList: [],
       imgRes: null,
-      imgPositionStr: "",
       folderPath: "",
       imageName: "",
       imgUrl: "",
@@ -76,10 +67,6 @@ export default {
     };
   },
   computed: {
-    boardLength() {
-      let l = this.historyClipBoard.length;
-      return l;
-    },
     classItem1() {
       return this.isActive ? "raiseItem1" : "downItem1";
     },
@@ -107,7 +94,7 @@ export default {
       });
     const _self = this;
     _self.timerId = timerModule.setInterval(() => {
-      _self.onButtonTap();
+      _self.getClipBoard();
     }, 1000);
   },
   methods: {
@@ -123,50 +110,61 @@ export default {
         rootLayout.android.setClipChildren(false);
       }
     },
-    onCroseeButtonTap(args) {
-      this.isActive = !this.isActive;
-    },
-    onButtonTap() {
-      console.log("get clipboard");
+
+    getClipBoard() {
       Clipboard.getText().then(content => {
+        //console.log(this.imgUrlList);
         console.log(content);
         let insUrl = content;
-        if (this.historyClipBoard.indexOf(content) === -1) {
-          this.historyClipBoard.push(content);
-          this.msg = "get html page";
+        this.historyClipBoard.push(content);
+        this.msg = "get html page";
 
-          httpModule
-            .request({
-              url: insUrl,
-              method: "GET"
-            })
-            .then(
-              response => {
-                // Content property of the response is HttpContent
-                // The toString method allows you to get the response body as string.
-                const str = response.content.toString();
-                console.log("---------response---------\n", response);
-                console.log(
-                  "------------response content--------------\n",
-                  str
-                );
-                let searchStr = '<meta property="og:image" content=';
-                var n = str.search(searchStr);
-                console.log("img position  ", n);
-                let tempStr = str.substr(n + searchStr.length + 1, str.length);
-                let tagEnd = tempStr.search("/>");
-                let result = tempStr.substr(0, tagEnd - 2);
+        httpModule
+          .request({
+            url: insUrl,
+            method: "GET"
+          })
+          .then(
+            response => {
+              // Content property of the response is HttpContent
+              // The toString method allows you to get the response body as string.
+              const str = response.content.toString();
+              // console.log("---------response---------\n", response);
+              // console.log("------------response content--------------\n", str);
 
-                this.imgPositionStr = result;
-                console.log(result);
-                this.imgRes = result;
-                this.imgUrlList.push(result);
-                // this.showInsImg(result)
-              },
-              e => {}
-            );
-        }
+              let displayUrlNum = str.match(/display_url/g).length;
+              console.log(displayUrlNum);
+              this.cutDisplayUrl(str,displayUrlNum,0)
+            },
+            e => {}
+          );
       });
+    },
+    /**
+     * get the img url
+     */
+    cutDisplayUrl(str, displayUrlNum, displayUrlIdx) {
+      let idx = displayUrlIdx;
+      let searchStr = "display_url";
+      let n = str.search(searchStr);
+      console.log("img position  ", n);
+      let tempStr = str.substr(n + searchStr.length + 2, str.length);
+      let tagEnd = tempStr.search(",");
+      let result = tempStr.substr(1, tagEnd - 2);
+      //console.log(result);
+
+      if (this.imgUrlList.indexOf(result) === -1) {
+        this.imgUrlList.push(result);
+      }
+      if (displayUrlNum > 1) {
+        idx++;
+        console.log("in next");
+        if (idx + 1 > displayUrlNum) {
+          return;
+        } else {
+          return this.cutDisplayUrl(tempStr, displayUrlNum, idx);
+        }
+      }
     },
     getImgName() {
       let y = new Date().getFullYear();
@@ -191,7 +189,7 @@ export default {
       }
     },
     showInsImg(url) {
-      this.msg = "get the image...";
+      this.msg = "download the image...";
       this.folderPath = "PATH";
       let insUrl = url.trim();
       console.log(insUrl);
@@ -231,19 +229,14 @@ export default {
 
     clearHis() {
       this.historyClipBoard = [];
-			this.imgUrlList = [];
-			this.msg = 'clear all img list'
+      this.imgUrlList = [];
+      this.msg = "clear all img list";
     },
     onItemTap(content) {
       this.clipboardText = content;
     }
   },
   watch: {
-    boardLength(val, oldVal) {
-      if (val > 0) {
-        // this.onButtonTap()
-      }
-    },
     msg(val, oldVal) {
       Toast.makeText(val).show();
     }
