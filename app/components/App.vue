@@ -131,10 +131,27 @@ export default {
               const str = response.content.toString();
               // console.log("---------response---------\n", response);
               // console.log("------------response content--------------\n", str);
+              let searchStr = "is_video";
 
-              let displayUrlNum = str.match(/display_url/g).length;
-              console.log(displayUrlNum);
-              this.cutDisplayUrl(str,displayUrlNum,0)
+              let isvideoPos = str.search(searchStr);
+              let isVideo = str.substr(isvideoPos + searchStr.length + 2, 1);
+              console.log(isVideo);
+              if (isVideo === "f") {
+                let displayUrlNum = str.match(/display_url/g).length;
+                console.log(displayUrlNum);
+                this.cutDisplayUrl(str, displayUrlNum, 0);
+              } else {
+                console.warn('IS VIDEO')
+                let searchStr = "video_url";
+                let n = str.search(searchStr);
+
+                let tempStr = str.substr(n + searchStr.length + 2, str.length);
+                let end = tempStr.search(",");
+                let videoUrl = tempStr.substr(1, end - 2).trim();
+                console.log(videoUrl);
+                // TODO DOWNLOAD VIDEO?
+                // this.imgUrlList.push(videoUrl)
+              }
             },
             e => {}
           );
@@ -207,6 +224,7 @@ export default {
 
           let name = this.getImgName();
           let sIdx = insUrl.search(".jpg");
+          console.log('sIdx=======================\n\n',sIdx)
           let fileName = insUrl.substring(sIdx - 20, sIdx + 4);
           console.log("fileName...", folder, fileName);
           const path = fileSystemModule.path.join(folder, fileName);
