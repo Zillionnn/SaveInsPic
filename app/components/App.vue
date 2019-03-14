@@ -292,6 +292,7 @@ export default {
     clearHis() {
       this.historyClipBoard = [];
       this.imgUrlList = [];
+      this.downloadList = []
       this.msg = "clear all img list";
     },
     onItemTap(content) {
