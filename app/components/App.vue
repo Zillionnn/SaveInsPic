@@ -57,7 +57,8 @@ export default {
       msg: "Hello World!",
       clipboardText: null,
       historyClipBoard: [],
-      imgUrlList: [],
+      imgUrlList: [], // url 列表
+      downloadList: [], // 下载列表
       imgRes: null,
       folderPath: "",
       imageName: "",
@@ -117,7 +118,6 @@ export default {
         console.log(content);
         let insUrl = content;
         this.historyClipBoard.push(content);
-        this.msg = "get html page";
 
         httpModule
           .request({
@@ -141,16 +141,30 @@ export default {
                 console.log(displayUrlNum);
                 this.cutDisplayUrl(str, displayUrlNum, 0);
               } else {
-                console.warn('IS VIDEO')
+                console.warn("IS VIDEO");
                 let searchStr = "video_url";
                 let n = str.search(searchStr);
-
                 let tempStr = str.substr(n + searchStr.length + 2, str.length);
                 let end = tempStr.search(",");
                 let videoUrl = tempStr.substr(1, end - 2).trim();
                 console.log(videoUrl);
+
+                let videoImgStr = '<meta property="og:image" content=';
+                n = str.search(videoImgStr);
+                console.log("img position  ", n);
+                tempStr = str.substr(n + videoImgStr.length + 1, str.length);
+                let tagEnd = tempStr.search("/>");
+                let result = tempStr.substr(0, tagEnd - 2);
+
                 // TODO DOWNLOAD VIDEO?
-                // this.imgUrlList.push(videoUrl)
+                if (this.imgUrlList.indexOf(result) === -1) {
+                  // 显示
+                  this.imgUrlList.push(result);
+                  this.downloadList.push({
+                    type: "video",
+                    url: videoUrl
+                  });
+                }
               }
             },
             e => {}
@@ -167,11 +181,15 @@ export default {
       console.log("img position  ", n);
       let tempStr = str.substr(n + searchStr.length + 2, str.length);
       let tagEnd = tempStr.search(",");
-      let result = tempStr.substr(1, tagEnd - 2);
+      let imgUrl = tempStr.substr(1, tagEnd - 2);
       //console.log(result);
 
-      if (this.imgUrlList.indexOf(result) === -1) {
-        this.imgUrlList.push(result);
+      if (this.imgUrlList.indexOf(imgUrl) === -1) {
+        this.imgUrlList.push(imgUrl);
+        this.downloadList.push({
+          type: "img",
+          url: imgUrl
+        });
       }
       if (displayUrlNum > 1) {
         idx++;
@@ -198,14 +216,18 @@ export default {
      * download all pictures
      */
     downLoadPic() {
-      let list = this.imgUrlList;
+      let list = this.downloadList;
       this.msg = "start download";
       console.info("---DOWNLOAD LIST---\n", list);
       for (let i of list) {
-        this.showInsImg(i);
+        if (i.type === "img") {
+          this.getPic(i.url);
+        } else {
+          this.getVideo(i.url);
+        }
       }
     },
-    showInsImg(url) {
+    getPic(url) {
       this.msg = "download the image...";
       this.folderPath = "PATH";
       let insUrl = url.trim();
@@ -222,16 +244,13 @@ export default {
           const folder = "/storage/emulated/0/saveInsImg";
           this.msg = folder;
 
-          let name = this.getImgName();
           let sIdx = insUrl.search(".jpg");
-          console.log('sIdx=======================\n\n',sIdx)
+          console.log("sIdx=======================\n\n", sIdx);
           let fileName = insUrl.substring(sIdx - 20, sIdx + 4);
           console.log("fileName...", folder, fileName);
           const path = fileSystemModule.path.join(folder, fileName);
           console.log(path);
-          this.folderPath = this.folderPath + ";" + path;
           const saved = r.saveToFile(path, "png");
-          this.folderPath = this.folderPath + ";" + saved;
           if (saved) {
             console.log("Image saved successfully!");
           }
@@ -239,9 +258,34 @@ export default {
           this.msg = "save image success";
         })
         .catch(err => {
-          {
-            Toast.makeText(err).show();
-          }
+          this.msg = err;
+        });
+    },
+
+    /**
+     * downlaod video
+     */
+    getVideo(url) {
+      this.msg = "download the image...";
+      this.folderPath = "PATH";
+      let insUrl = url.trim();
+      console.log(insUrl);
+      const folder = "/storage/emulated/0/saveInsImg";
+
+      let sIdx = insUrl.search(".mp4");
+      console.log("sIdx=======================\n\n", sIdx);
+      let fileName = insUrl.substring(sIdx - 20, sIdx + 4);
+      console.log("fileName...", folder, fileName);
+      const path = `${folder}/${fileName}`;
+      console.log(path);
+
+      httpModule
+        .getFile(insUrl, path)
+        .then(r => {
+          this.msg = "save video success";
+        })
+        .catch(err => {
+          this.msg = err;
         });
     },
 
