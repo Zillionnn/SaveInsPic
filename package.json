@@ -1,9 +1,13 @@
 {
   "name": "nts_demo3_vuecli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A native application built with NativeScript-Vue",
   "author": "Administrator <skyestzhang@163.com>",
   "license": "MIT",
+  "scripts":{
+    "build": "tns build android --bundle",
+    "release": "tns build android --bundle --release --key-store-path D:/keystore/file.keystore --key-store-password 123456 --key-store-alias zillionnn --key-store-alias-password 123456"
+  },
   "nativescript": {
     "id": "org.nativescript.saveinspic",
     "tns-ios": {
