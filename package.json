@@ -5,8 +5,7 @@
   "author": "Administrator <skyestzhang@163.com>",
   "license": "MIT",
   "scripts":{
-    "build": "tns build android --bundle",
-    "release": "tns build android --bundle --release --key-store-path D:/keystore/file.keystore --key-store-password 123456 --key-store-alias zillionnn --key-store-alias-password 123456"
+    "build": "tns build android --bundle"
   },
   "nativescript": {
     "id": "org.nativescript.saveinspic",
