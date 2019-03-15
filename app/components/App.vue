@@ -15,9 +15,17 @@
         ios.position="right"
         android.position="popup"
       ></ActionItem>
+      <ActionItem
+        @tap="goToAboutPage"
+        text="About"
+        ios.systemIcon="16"
+        ios.position="right"
+        android.position="popup"
+      ></ActionItem>
     </ActionBar>
     <AbsoluteLayout ref="rootLayout">
       <ListView
+        v-if="imgUrlList.length > 0"
         for="item in imgUrlList"
         @itemTap="onItemTap"
         left="1.5%"
@@ -33,128 +41,130 @@
           </StackLayout>
         </v-template>
       </ListView>
+      <Label v-else text="images will be shown here"/>
     </AbsoluteLayout>
   </Page>
 </template>
 
 <script >
 // const Clipboard = require('nativescript-clipboard')
-import * as Clipboard from 'nativescript-clipboard';
-import * as httpModule from 'http';
-import * as imageSourceModule from 'tns-core-modules/image-source';
-import * as fileSystemModule from 'tns-core-modules/file-system';
-import * as permissions from 'nativescript-permissions';
-import * as Toast from 'nativescript-toast';
-import * as timerModule from 'tns-core-modules/timer';
+import * as Clipboard from "nativescript-clipboard";
+import * as httpModule from "http";
+import * as imageSourceModule from "tns-core-modules/image-source";
+import * as fileSystemModule from "tns-core-modules/file-system";
+import * as permissions from "nativescript-permissions";
+import * as Toast from "nativescript-toast";
+import * as timerModule from "tns-core-modules/timer";
+import * as appSettings from "tns-core-modules/application-settings"
 
-const app = require('tns-core-modules/application')
-const platform = require('tns-core-modules/platform')
+import About from "./page/about";
+
+const app = require("tns-core-modules/application");
+const platform = require("tns-core-modules/platform");
 
 export default {
-	components: {
-
-	},
-
-	data () {
-		return {
-			isActive: false,
-			msg: 'Hello World!',
-			clipboardText: null,
-			historyClipBoard: [],
-			imgUrlList: [], // url 列表
-			downloadList: [], // 下载列表
-			imgRes: null,
-			folderPath: '',
-			imageName: '',
-			imgUrl: '',
-			timerId: '',
-			items: [1, 2, 3]
-		}
+  components: {
+    About
   },
-	computed: {},
-	created () {
-		permissions
-			.requestPermission(
-				android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-				'I need these permissions because I\'m cool'
-			)
-			.then(function () {
-				console.log('Woo Hoo, I have the power!')
+
+  data() {
+    return {
+      isActive: false,
+      msg: "Hello World!",
+      clipboardText: null,
+      historyClipBoard: [],
+      imgUrlList: [], // url 列表
+      downloadList: [], // 下载列表
+      imgRes: null,
+      folderPath: "",
+      imageName: "",
+      imgUrl: "",
+      timerId: "",
+      items: [1, 2, 3]
+    };
+  },
+  computed: {},
+  created() {
+    permissions
+      .requestPermission(
+        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        "I need these permissions because I'm cool"
+      )
+      .then(function() {
+        console.log("Woo Hoo, I have the power!");
       })
-			.catch(function () {
-				console.log('Uh oh, no permissions - plan B time!')
-      })
-    const _self = this
+      .catch(function() {
+        console.log("Uh oh, no permissions - plan B time!");
+      });
+    const _self = this;
     _self.timerId = timerModule.setInterval(() => {
-			_self.getClipBoard()
-    }, 1000)
+      _self.getClipBoard();
+    }, 1000);
   },
-	methods: {
-		getClipBoard () {
-			Clipboard.getText().then(content => {
-				// console.log(this.imgUrlList);
-				console.log(content)
-        let insUrl = content
-        this.historyClipBoard.push(content)
+  methods: {
+    getClipBoard() {
+      Clipboard.getText().then(content => {
+        // console.log(this.imgUrlList);
+        console.log(content);
+        let insUrl = content;
+        this.historyClipBoard.push(content);
 
         httpModule
-					.request({
-						url: insUrl,
-						method: 'GET'
-					})
-					.then(
-						response => {
-							// Content property of the response is HttpContent
-							// The toString method allows you to get the response body as string.
-							const str = response.content.toString()
+          .request({
+            url: insUrl,
+            method: "GET"
+          })
+          .then(
+            response => {
+              // Content property of the response is HttpContent
+              // The toString method allows you to get the response body as string.
+              const str = response.content.toString();
               // console.log("---------response---------\n", response);
               // console.log("------------response content--------------\n", str);
-              let searchStr = 'is_video';
+              let searchStr = "is_video";
 
-							let isvideoPos = str.search(searchStr)
-              let isVideo = str.substr(isvideoPos + searchStr.length + 2, 1)
-              console.log(isVideo)
-              if (isVideo === 'f') {
-								let displayUrlNum = str.match(/display_url/g).length
-                console.log(displayUrlNum)
-                this.cutDisplayUrl(str, displayUrlNum, 0)
+              let isvideoPos = str.search(searchStr);
+              let isVideo = str.substr(isvideoPos + searchStr.length + 2, 1);
+              console.log(isVideo);
+              if (isVideo === "f") {
+                let displayUrlNum = str.match(/display_url/g).length;
+                console.log(displayUrlNum);
+                this.cutDisplayUrl(str, displayUrlNum, 0);
               } else {
-								console.warn('IS VIDEO')
-                let searchStr = 'video_url';
-								let n = str.search(searchStr)
-                let tempStr = str.substr(n + searchStr.length + 2, str.length)
-                let end = tempStr.search(',')
-                let videoUrl = tempStr.substr(1, end - 2).trim()
-                console.log(videoUrl)
+                console.warn("IS VIDEO");
+                let searchStr = "video_url";
+                let n = str.search(searchStr);
+                let tempStr = str.substr(n + searchStr.length + 2, str.length);
+                let end = tempStr.search(",");
+                let videoUrl = tempStr.substr(1, end - 2).trim();
+                console.log(videoUrl);
 
-                let videoImgStr = '<meta property="og:image" content='
-                n = str.search(videoImgStr)
-                console.log('img position  ', n)
-                tempStr = str.substr(n + videoImgStr.length + 1, str.length)
-                let tagEnd = tempStr.search('/>')
-                let result = tempStr.substr(0, tagEnd - 2)
+                let videoImgStr = '<meta property="og:image" content=';
+                n = str.search(videoImgStr);
+                console.log("img position  ", n);
+                tempStr = str.substr(n + videoImgStr.length + 1, str.length);
+                let tagEnd = tempStr.search("/>");
+                let result = tempStr.substr(0, tagEnd - 2);
 
                 // TODO DOWNLOAD VIDEO?
                 if (this.imgUrlList.indexOf(result) === -1) {
-									// 显示
-									this.imgUrlList.push(result)
+                  // 显示
+                  this.imgUrlList.push(result);
                   this.downloadList.push({
-										type: 'video',
-										url: videoUrl
-									})
+                    type: "video",
+                    url: videoUrl
+                  });
                 }
-							}
-						},
-						e => {
-
-						}
-					)
-      })
+              }
+            },
+            e => {}
+          );
+      });
     },
-		/**
+    /**
      * get the img url
      */
-		cutDisplayUrl (str, displayUrlNum, displayUrlIdx) {
+    cutDisplayUrl(str, displayUrlNum, displayUrlIdx) {
       let idx = displayUrlIdx;
       let searchStr = "display_url";
       let n = str.search(searchStr);
@@ -175,116 +185,118 @@ export default {
         idx++;
         console.log("in next");
         if (idx + 1 > displayUrlNum) {
-          
         } else {
           return this.cutDisplayUrl(tempStr, displayUrlNum, idx);
         }
       }
     },
-		getImgName () {
-			let y = new Date().getFullYear()
-      let m = new Date().getMonth() + 1
-      let date = new Date().getDate()
-      let h = new Date().getHours()
-      let min = new Date().getMinutes()
-      let s = new Date().getSeconds()
-      let name = `${y}${m}${date}${h}${min}${s}`
-      this.imageName = name
-      return name
+    getImgName() {
+      let y = new Date().getFullYear();
+      let m = new Date().getMonth() + 1;
+      let date = new Date().getDate();
+      let h = new Date().getHours();
+      let min = new Date().getMinutes();
+      let s = new Date().getSeconds();
+      let name = `${y}${m}${date}${h}${min}${s}`;
+      this.imageName = name;
+      return name;
     },
-		/**
+    /**
      * download all pictures
      */
-		downLoadPic () {
-			let list = this.downloadList
-      this.msg = 'start download';
-			console.info('---DOWNLOAD LIST---\n', list)
+    downLoadPic() {
+      let list = this.downloadList;
+      this.msg = "start download";
+      console.info("---DOWNLOAD LIST---\n", list);
       for (let i of list) {
-				if (i.type === 'img') {
-					this.getPic(i.url)
+        if (i.type === "img") {
+          this.getPic(i.url);
         } else {
-					this.getVideo(i.url)
+          this.getVideo(i.url);
         }
-			}
-		},
-		getPic (url) {
-			this.msg = 'download the image...';
-			this.folderPath = 'PATH';
-			let insUrl = url.trim()
-      console.log(insUrl)
+      }
+    },
+    getPic(url) {
+      this.msg = "download the image...";
+      this.folderPath = "PATH";
+      let insUrl = url.trim();
+      console.log(insUrl);
       httpModule
-				.getImage(insUrl)
-				.then(r => {
-					// getImage method returns ImageSource object
-					console.log(r)
+        .getImage(insUrl)
+        .then(r => {
+          // getImage method returns ImageSource object
+          console.log(r);
           // this.imgRes = r
 
           // const folder = fileSystemModule.knownFolders.documents().path;
 
-          const folder = '/storage/emulated/0/saveInsImg';
-					this.msg = folder
+          const folder = "/storage/emulated/0/saveInsImg";
+          this.msg = folder;
 
-          let sIdx = insUrl.search('.jpg')
-          console.log('sIdx=======================\n\n', sIdx)
-          let fileName = insUrl.substring(sIdx - 20, sIdx + 4)
-          console.log('fileName...', folder, fileName)
-          const path = fileSystemModule.path.join(folder, fileName)
-          console.log(path)
-          const saved = r.saveToFile(path, 'png')
+          let sIdx = insUrl.search(".jpg");
+          console.log("sIdx=======================\n\n", sIdx);
+          let fileName = insUrl.substring(sIdx - 20, sIdx + 4);
+          console.log("fileName...", folder, fileName);
+          const path = fileSystemModule.path.join(folder, fileName);
+          console.log(path);
+          const saved = r.saveToFile(path, "png");
           if (saved) {
-						console.log('Image saved successfully!')
+            console.log("Image saved successfully!");
           }
 
-					this.msg = 'save image success';
-				})
-				.catch(err => {
-					this.msg = err
+          this.msg = "save image success";
         })
+        .catch(err => {
+          this.msg = err;
+        });
     },
 
-		/**
+    /**
      * downlaod video
      */
-		getVideo (url) {
-			this.msg = 'download the image...';
-			this.folderPath = 'PATH';
-			let insUrl = url.trim()
-      console.log(insUrl)
-      const folder = '/storage/emulated/0/saveInsImg';
+    getVideo(url) {
+      this.msg = "download the image...";
+      this.folderPath = "PATH";
+      let insUrl = url.trim();
+      console.log(insUrl);
+      const folder = "/storage/emulated/0/saveInsImg";
 
-			let sIdx = insUrl.search('.mp4')
-      console.log('sIdx=======================\n\n', sIdx)
-      let fileName = insUrl.substring(sIdx - 20, sIdx + 4)
-      console.log('fileName...', folder, fileName)
-      const path = `${folder}/${fileName}`
-      console.log(path)
+      let sIdx = insUrl.search(".mp4");
+      console.log("sIdx=======================\n\n", sIdx);
+      let fileName = insUrl.substring(sIdx - 20, sIdx + 4);
+      console.log("fileName...", folder, fileName);
+      const path = `${folder}/${fileName}`;
+      console.log(path);
 
       httpModule
-				.getFile(insUrl, path)
-				.then(r => {
-					this.msg = 'save video success';
-				})
-				.catch(err => {
-					this.msg = err
+        .getFile(insUrl, path)
+        .then(r => {
+          this.msg = "save video success";
         })
+        .catch(err => {
+          this.msg = err;
+        });
     },
 
-		clearHis () {
-			this.historyClipBoard = []
-      this.imgUrlList = []
-      this.downloadList = []
-      this.msg = 'clear all img list';
-		},
-		onItemTap (content) {
-			this.clipboardText = content
+    clearHis() {
+      this.historyClipBoard = [];
+      this.imgUrlList = [];
+      this.downloadList = [];
+      this.msg = "clear all img list";
+    },
+    onItemTap(content) {
+      this.clipboardText = content;
+    },
+    goToAboutPage() {
+      this.$navigateTo(About);
     }
-	},
-	watch: {
-		msg (val, oldVal) {
-			Toast.makeText(val).show()
+  },
+  watch: {
+    msg(val, oldVal) {
+      Toast.makeText(val).show();
     }
-	}
-}
+  }
+};
 </script>
 
 <style scoped>
