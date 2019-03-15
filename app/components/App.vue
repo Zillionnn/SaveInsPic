@@ -3,14 +3,14 @@
     <ActionBar title="Save Instagram Pic">
       <ActionItem
         @tap="downLoadPic"
-        text="download pictures"
+        text="download all"
         ios.systemIcon="16"
         ios.position="right"
         android.position="popup"
       ></ActionItem>
       <ActionItem
         @tap="clearHis"
-        text="clear image list"
+        text="clear list"
         ios.systemIcon="16"
         ios.position="right"
         android.position="popup"
