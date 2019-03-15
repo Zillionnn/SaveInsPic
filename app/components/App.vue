@@ -1,12 +1,20 @@
 <template>
-  <Page >
+  <Page>
     <ActionBar title="Save Instagram Pic">
-       <ActionItem @tap="downLoadPic" text="download pictures" 
-            ios.systemIcon="16" ios.position="right"
-            android.position="popup"></ActionItem>
-       <ActionItem @tap="clearHis" text="clear image list" 
-            ios.systemIcon="16" ios.position="right"
-            android.position="popup"></ActionItem>
+      <ActionItem
+        @tap="downLoadPic"
+        text="download pictures"
+        ios.systemIcon="16"
+        ios.position="right"
+        android.position="popup"
+      ></ActionItem>
+      <ActionItem
+        @tap="clearHis"
+        text="clear image list"
+        ios.systemIcon="16"
+        ios.position="right"
+        android.position="popup"
+      ></ActionItem>
     </ActionBar>
     <AbsoluteLayout ref="rootLayout">
       <ListView
@@ -24,7 +32,7 @@
             <Image :src="item" stretch="aspectFill" width="100%" height="auto"/>
           </StackLayout>
         </v-template>
-      </ListView>     
+      </ListView>
     </AbsoluteLayout>
   </Page>
 </template>
@@ -38,9 +46,6 @@ import * as fileSystemModule from "tns-core-modules/file-system";
 import * as permissions from "nativescript-permissions";
 import * as Toast from "nativescript-toast";
 import * as timerModule from "tns-core-modules/timer";
-
-import FabButton from "./fabItem/FabButton";
-import FabItem from "./fabItem/FabItem";
 
 const app = require("tns-core-modules/application");
 const platform = require("tns-core-modules/platform");
@@ -67,20 +72,7 @@ export default {
       items: [1, 2, 3]
     };
   },
-  computed: {
-    classItem1() {
-      return this.isActive ? "raiseItem1" : "downItem1";
-    },
-    classItem2() {
-      return this.isActive ? "raiseItem2" : "downItem2";
-    },
-    classItem3() {
-      return this.isActive ? "raiseItem3" : "downItem3";
-    },
-    classBackdrop() {
-      return this.isActive ? "backdrop-visible" : "backdrop-invisible";
-    }
-  },
+  computed: {},
   created() {
     permissions
       .requestPermission(
@@ -99,19 +91,6 @@ export default {
     }, 1000);
   },
   methods: {
-    appLoaded(args) {
-      let fabItemContainer = this.$refs.fabItemContainer.nativeView;
-      let fabItemPosition = this.$refs.fabItemPosition.nativeView;
-      let rootLayout = this.$refs.rootLayout.nativeView;
-
-      // Needed to avoid masking child components on Android
-      if (app.android && platform.device.sdkVersion >= "21") {
-        fabItemContainer.android.setClipChildren(false);
-        fabItemPosition.android.setClipChildren(false);
-        rootLayout.android.setClipChildren(false);
-      }
-    },
-
     getClipBoard() {
       Clipboard.getText().then(content => {
         //console.log(this.imgUrlList);
@@ -292,7 +271,7 @@ export default {
     clearHis() {
       this.historyClipBoard = [];
       this.imgUrlList = [];
-      this.downloadList = []
+      this.downloadList = [];
       this.msg = "clear all img list";
     },
     onItemTap(content) {
