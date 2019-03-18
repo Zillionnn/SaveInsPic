@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "A native application built with NativeScript-Vue",
   "author": "Administrator <skyestzhang@163.com>",
-  "license": "MIT",
+  "license": "Apache 2.0",
   "scripts":{
     "build": "tns build android --bundle"
   },
