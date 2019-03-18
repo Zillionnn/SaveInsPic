@@ -300,10 +300,7 @@ export default {
 </script>
 
 <style scoped>
-Page {
-  background: #333333;
-  color: #dddddd;
-}
+
 ActionBar {
   background-color: #53ba82;
   color: #ffffff;

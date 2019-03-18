@@ -29,19 +29,18 @@ export default {
 </script>
 
 <style scoped>
-Page {
-  background: #333333;
-  color: #dddddd;
-}
+
 ActionBar {
   background-color: #53ba82;
-  color: #dddddd;
+  color: #ffffff;
 }
 .center_msg{
   margin:0 auto;
   text-align: center;
+  color: #000000;
 }
 .h1{
+  margin-top: 30px;
   font-size: 32px;
 }
 </style>
