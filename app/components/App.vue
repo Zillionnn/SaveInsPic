@@ -41,7 +41,7 @@
           </StackLayout>
         </v-template>
       </ListView>
-      <Label v-else text="images will be shown here"/>
+      <Label v-else text="images will be shown here" top="40"/>
     </AbsoluteLayout>
   </Page>
 </template>
