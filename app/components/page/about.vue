@@ -31,17 +31,17 @@ export default {
 <style scoped>
 Page {
   background: #333333;
-  color: #ffffff;
+  color: #dddddd;
 }
 ActionBar {
   background-color: #53ba82;
-  color: #ffffff;
+  color: #dddddd;
 }
 .center_msg{
   margin:0 auto;
   text-align: center;
 }
 .h1{
-  font-size: 43px;
+  font-size: 32px;
 }
 </style>

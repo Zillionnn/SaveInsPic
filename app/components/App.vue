@@ -41,7 +41,7 @@
           </StackLayout>
         </v-template>
       </ListView>
-      <Label v-else text="images will be shown here" top="40"/>
+      <Label v-else text="images will be shown here" top="32" left="15"/>
     </AbsoluteLayout>
   </Page>
 </template>
@@ -300,6 +300,10 @@ export default {
 </script>
 
 <style scoped>
+Page {
+  background: #333333;
+  color: #dddddd;
+}
 ActionBar {
   background-color: #53ba82;
   color: #ffffff;
@@ -335,93 +339,5 @@ ListView label {
   animation-direction: reverse;
 }
 
-.raiseItem1 {
-  opacity: 1;
-  animation-name: raiseItem1;
-  animation-duration: 0.25;
-  animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
-  animation-fill-mode: forwards;
-}
 
-.raiseItem2 {
-  opacity: 1;
-  animation-name: raiseItem2;
-  animation-duration: 0.25;
-  animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
-  animation-fill-mode: forwards;
-}
-
-.raiseItem3 {
-  opacity: 1;
-  animation-name: raiseItem3;
-  animation-duration: 0.25;
-  animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
-  animation-fill-mode: forwards;
-}
-
-.downItem1 {
-  animation-name: raiseItem1;
-  animation-duration: 0.2;
-  animation-timing-function: cubic-bezier(0.895, 0.03, 0.685, 0.22);
-  animation-fill-mode: forwards;
-  animation-direction: reverse;
-}
-
-.downItem2 {
-  animation-name: raiseItem2;
-  animation-duration: 0.2;
-  animation-timing-function: cubic-bezier(0.895, 0.03, 0.685, 0.22);
-  animation-fill-mode: forwards;
-  animation-direction: reverse;
-}
-
-.downItem3 {
-  animation-name: raiseItem3;
-  animation-duration: 0.2;
-  animation-timing-function: cubic-bezier(0.895, 0.03, 0.685, 0.22);
-  animation-fill-mode: forwards;
-  animation-direction: reverse;
-}
-
-@keyframes activateBackdrop {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes raiseItem1 {
-  from {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate(0, -64);
-  }
-}
-
-@keyframes raiseItem2 {
-  from {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate(0, -128);
-  }
-}
-
-@keyframes raiseItem3 {
-  from {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate(0, -192);
-  }
-}
 </style>
