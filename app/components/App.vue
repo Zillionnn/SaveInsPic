@@ -41,7 +41,7 @@
           </StackLayout>
         </v-template>
       </ListView>
-      <Label v-else text="images will be shown here" top="32" left="15"/>
+      <Label v-else text="The images will be displayed here" top="32" left="15"/>
     </AbsoluteLayout>
   </Page>
 </template>
@@ -295,10 +295,10 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 ActionBar {
-  background-color: #53ba82;
-  color: #ffffff;
+  background-color: #ff9800;
+  color: #000000;
 }
 
 .message {

@@ -29,11 +29,6 @@ export default {
 </script>
 
 <style scoped>
-
-ActionBar {
-  background-color: #53ba82;
-  color: #ffffff;
-}
 .center_msg{
   margin:14px auto;
   text-align: center;
