@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body{
+            background: #000000;
+        }
+        canvas{
+          
+        }
+    </style>
+</head>
+<body>
+    <div id="svg-wrap" hidden>
+            <svg aria-hidden="true" focusable="false"
+            data-prefix="fas" data-icon="cheese-swiss"
+            role="img" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
+            class="svg-inline--fa fa-cheese-swiss fa-w-16 fa-9x">
+            <path fill="#ff9800" d="M368 336a48 48 0 0 1-48-48H0v160a32 32 0 0 0 32 32h448a32 32 0 0 0 32-32V288h-96a48 48 0 0 1-48 48zm-192 96a48 48 0 1 1 48-48 48 48 0 0 1-48 48zM299.83 32a32 32 0 0 0-21.13 7l-61.76 48.06a47.91 47.91 0 0 1-75.1 58.48L0 256h512c0-119.89-94-217.8-212.17-224z" class=""></path></svg>
+    </div>
+
+    <canvas id="canvas"></canvas>
+</body>
+</html>
+<script>
+window.onload = function () {
+	// 获取svg内容
+	var svg = document.getElementById('svg-wrap').innerHTML
+
+	var canvas = document.getElementById('canvas')
+	var c = canvas.getContext('2d')
+
+
+	// 新建Image对象
+	var img = new Image()
+
+	// svg内容
+	img.src = 'data:image/svg+xml,' + unescape(encodeURIComponent(svg))// svg内容中可以有中文字符
+	img.src = 'data:image/svg+xml,' + svg// svg内容中不能有中文字符
+
+	// svg编码成base64
+	img.src = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svg)))// svg内容中可以有中文字符
+	img.src = 'data:image/svg+xml;base64,' + window.btoa(svg)// svg内容中不能有中文字符
+
+	// 图片初始化完成后调用
+	img.onload = function () {
+		// 将canvas的宽高设置为图像的宽高
+		img.width = 600
+		img.height = 600
+		canvas.width = img.width
+		canvas.height = img.height
+		roundedRect(c, 0, 0, canvas.width, canvas.height, 8)
+		// canvas画图片
+		c.drawImage(img, 0, 0)
+
+		// 将图片添加到body中
+		// document.body.appendChild(img)
+	}
+}
+
+function roundedRect (ctx, x, y, width, height, radius) {
+    ctx.strokeStyle = '#fff';
+    ctx.fillStyle = '#fff';
+	ctx.beginPath()
+        ctx.moveTo(x, y + radius)
+        ctx.lineTo(x, y + height - radius)
+        ctx.quadraticCurveTo(x, y + height, x + radius, y + height)
+        ctx.lineTo(x + width - radius, y + height)
+        ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius)
+        ctx.lineTo(x + width, y + radius)
+        ctx.quadraticCurveTo(x + width, y, x + width - radius, y)
+        ctx.lineTo(x + radius, y)
+        ctx.quadraticCurveTo(x, y, x, y + radius)
+        ctx.stroke()
+        ctx.fill()
+    }
+</script>
