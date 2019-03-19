@@ -35,7 +35,7 @@ ActionBar {
   color: #ffffff;
 }
 .center_msg{
-  margin:0 auto;
+  margin:14px auto;
   text-align: center;
   color: #000000;
 }
