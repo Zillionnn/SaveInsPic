@@ -127,39 +127,83 @@ export default {
               const str = response.content.toString();
               // console.log("---------response---------\n", response);
               // console.log("------------response content--------------\n", str);
-              let searchStr = "is_video";
+              let searchStr = "window._sharedData = ";
+              let _sharedDataStartPosition = str.search(searchStr);
+              console.log(_sharedDataStartPosition);
+              let st = _sharedDataStartPosition + searchStr.length;
+              console.log(st);
+              let tempStr = str.substr(st, str.length);
+              let end = tempStr.search("</");
+              console.log(end);
+              let objStr = tempStr.substring(0, end - 1);
+              console.log(objStr[objStr.length - 1]);
+              let shareObj = JSON.parse(objStr);
+              let multiMedia =
+                shareObj.entry_data.PostPage[0].graphql.shortcode_media
+                  .edge_sidecar_to_children;
+              if (multiMedia) {
+                for (let i in multiMedia.edges) {
+                  let item = multiMedia.edges[i];
+                  if (item.node.is_video) {
+                    // 视频
+                    let videoUrl = item.node.video_url;
+                    let displayUrl = item.node.display_url;
+                    console.log(videoUrl);
+                    if (this.imgUrlList.indexOf(displayUrl) === -1) {
+                      // 显示
+                      this.imgUrlList.push(displayUrl);
+                      this.downloadList.push({
+                        type: "video",
+                        url: videoUrl
+                      });
+                    }
+                  } else {
+                    // 图片
+                    let displayUrl = item.node.display_url;
+                    console.log(displayUrl);
 
-              let isvideoPos = str.search(searchStr);
-              let isVideo = str.substr(isvideoPos + searchStr.length + 2, 1);
-              console.log(isVideo);
-              if (isVideo === "f") {
-                let displayUrlNum = str.match(/display_url/g).length;
-                console.log(displayUrlNum);
-                this.cutDisplayUrl(str, displayUrlNum, 0);
+                    if (this.imgUrlList.indexOf(displayUrl) === -1) {
+                      // 显示
+                      this.imgUrlList.push(displayUrl);
+                      this.downloadList.push({
+                        type: "img",
+                        url: displayUrl
+                      });
+                    }
+                  }
+                }
               } else {
-                console.warn("IS VIDEO");
-                let searchStr = "video_url";
-                let n = str.search(searchStr);
-                let tempStr = str.substr(n + searchStr.length + 2, str.length);
-                let end = tempStr.search(",");
-                let videoUrl = tempStr.substr(1, end - 2).trim();
-                console.log(videoUrl);
+                // 单张图，视频
 
-                let videoImgStr = '<meta property="og:image" content=';
-                n = str.search(videoImgStr);
-                console.log("img position  ", n);
-                tempStr = str.substr(n + videoImgStr.length + 1, str.length);
-                let tagEnd = tempStr.search("/>");
-                let result = tempStr.substr(0, tagEnd - 2);
+                let media =
+                  shareObj.entry_data.PostPage[0].graphql.shortcode_media;
+                // 单个视频
+                if (media.is_video) {
+                  // 视频
+                  let videoUrl = media.video_url;
+                  let displayUrl = media.display_url;
+                  console.log(videoUrl);
+                  if (this.imgUrlList.indexOf(displayUrl) === -1) {
+                    // 显示
+                    this.imgUrlList.push(displayUrl);
+                    this.downloadList.push({
+                      type: "video",
+                      url: videoUrl
+                    });
+                  }
+                } else {
+                  // 图片
+                  let displayUrl = media.display_url;
+                  console.log(displayUrl);
 
-                // TODO DOWNLOAD VIDEO?
-                if (this.imgUrlList.indexOf(result) === -1) {
-                  // 显示
-                  this.imgUrlList.push(result);
-                  this.downloadList.push({
-                    type: "video",
-                    url: videoUrl
-                  });
+                  if (this.imgUrlList.indexOf(displayUrl) === -1) {
+                    // 显示
+                    this.imgUrlList.push(displayUrl);
+                    this.downloadList.push({
+                      type: "img",
+                      url: displayUrl
+                    });
+                  }
                 }
               }
             },
@@ -282,7 +326,7 @@ export default {
       this.historyClipBoard = [];
       this.imgUrlList = [];
       this.downloadList = [];
-      Clipboard.setText('')
+      Clipboard.setText("");
       // this.msg = "clear all img list";
     },
     onItemTap(content) {
