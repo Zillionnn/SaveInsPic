@@ -282,6 +282,7 @@ export default {
       this.historyClipBoard = [];
       this.imgUrlList = [];
       this.downloadList = [];
+      Clipboard.setText('')
       // this.msg = "clear all img list";
     },
     onItemTap(content) {
