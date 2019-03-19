@@ -53,10 +53,9 @@ import * as httpModule from "http";
 import * as imageSourceModule from "tns-core-modules/image-source";
 import * as fileSystemModule from "tns-core-modules/file-system";
 import * as permissions from "nativescript-permissions";
-import * as Toast from "nativescript-toast";
 import * as timerModule from "tns-core-modules/timer";
-import * as appSettings from "tns-core-modules/application-settings"
-
+import * as appSettings from "tns-core-modules/application-settings";
+import { toast } from "../util/toast.js";
 import About from "./page/about";
 
 const app = require("tns-core-modules/application");
@@ -69,6 +68,7 @@ export default {
 
   data() {
     return {
+      sdCardPath: "",
       isActive: false,
       msg: "Hello World!",
       clipboardText: null,
@@ -100,6 +100,12 @@ export default {
     _self.timerId = timerModule.setInterval(() => {
       _self.getClipBoard();
     }, 1000);
+
+    this.sdCardPath = fileSystemModule.path.join(
+      android.os.Environment.getExternalStorageDirectory()
+        .getAbsolutePath()
+        .toString()
+    );
   },
   methods: {
     getClipBoard() {
@@ -172,7 +178,7 @@ export default {
       let tempStr = str.substr(n + searchStr.length + 2, str.length);
       let tagEnd = tempStr.search(",");
       let imgUrl = tempStr.substr(1, tagEnd - 2);
-      //console.log(result);
+      // console.log(result);
 
       if (this.imgUrlList.indexOf(imgUrl) === -1) {
         this.imgUrlList.push(imgUrl);
@@ -190,23 +196,12 @@ export default {
         }
       }
     },
-    getImgName() {
-      let y = new Date().getFullYear();
-      let m = new Date().getMonth() + 1;
-      let date = new Date().getDate();
-      let h = new Date().getHours();
-      let min = new Date().getMinutes();
-      let s = new Date().getSeconds();
-      let name = `${y}${m}${date}${h}${min}${s}`;
-      this.imageName = name;
-      return name;
-    },
     /**
      * download all pictures
      */
     downLoadPic() {
       let list = this.downloadList;
-      this.msg = "start download";
+      toast("start download");
       console.info("---DOWNLOAD LIST---\n", list);
       for (let i of list) {
         if (i.type === "img") {
@@ -217,8 +212,7 @@ export default {
       }
     },
     getPic(url) {
-      this.msg = "download the image...";
-      this.folderPath = "PATH";
+      // this.msg = "download the image...";
       let insUrl = url.trim();
       console.log(insUrl);
       httpModule
@@ -229,9 +223,10 @@ export default {
           // this.imgRes = r
 
           // const folder = fileSystemModule.knownFolders.documents().path;
+          const folder = this.sdCardPath + "/saveInsPic";
+          fileSystemModule.Folder.fromPath(folder);
 
-          const folder = "/storage/emulated/0/saveInsImg";
-          this.msg = folder;
+          toast(folder);
 
           let sIdx = insUrl.search(".jpg");
           console.log("sIdx=======================\n\n", sIdx);
@@ -244,10 +239,10 @@ export default {
             console.log("Image saved successfully!");
           }
 
-          this.msg = "save image success";
+          toast("save image success");
         })
         .catch(err => {
-          this.msg = err;
+          toast(err);
         });
     },
 
@@ -255,11 +250,16 @@ export default {
      * downlaod video
      */
     getVideo(url) {
-      this.msg = "download the image...";
-      this.folderPath = "PATH";
       let insUrl = url.trim();
       console.log(insUrl);
-      const folder = "/storage/emulated/0/saveInsImg";
+      const folder = this.sdCardPath + "/saveInsPic";
+      fileSystemModule.Folder.fromPath(folder);
+
+      // //Create a folder with known path
+      // var folder: fs.Folder = fs.Folder.fromPath(sdCardPath+"/test");
+      // //Create a file
+      // var testFile: fs.File = folder.getFile("test.txt");
+      // console.log("Path " + folder.path)
 
       let sIdx = insUrl.search(".mp4");
       console.log("sIdx=======================\n\n", sIdx);
@@ -271,10 +271,10 @@ export default {
       httpModule
         .getFile(insUrl, path)
         .then(r => {
-          this.msg = "save video success";
+          toast("save video success");
         })
         .catch(err => {
-          this.msg = err;
+          toast(err);
         });
     },
 
@@ -282,7 +282,7 @@ export default {
       this.historyClipBoard = [];
       this.imgUrlList = [];
       this.downloadList = [];
-      this.msg = "clear all img list";
+      // this.msg = "clear all img list";
     },
     onItemTap(content) {
       this.clipboardText = content;
@@ -291,16 +291,11 @@ export default {
       this.$navigateTo(About);
     }
   },
-  watch: {
-    msg(val, oldVal) {
-      Toast.makeText(val).show();
-    }
-  }
+  watch: {}
 };
 </script>
 
 <style scoped>
-
 ActionBar {
   background-color: #53ba82;
   color: #ffffff;
@@ -335,6 +330,4 @@ ListView label {
   animation-fill-mode: forwards;
   animation-direction: reverse;
 }
-
-
 </style>
