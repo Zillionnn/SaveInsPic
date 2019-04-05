@@ -8,6 +8,8 @@
 # Install dependencies
 npm install
 
+vue init nativescript-vue/vue-cli-template <project-name>
+
 # Build for production
 tns build <platform> --bundle
 
