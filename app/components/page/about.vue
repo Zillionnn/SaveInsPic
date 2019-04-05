@@ -5,7 +5,7 @@
     </ActionBar>
     <StackLayout class="page_body">
       <Label text="How To Use" class="left_title h1"/>
-      <Label text="1. open the app, and tap the home buton, DONT TAB the BACK button, it would close the app (Will fix it later)"
+      <Label text="1. open the app, and press the home buton, DONT PRESS the BACK button, it would close the app (Will fix it later)"
        :textWrap="true" class="text_line"/>
       <Label text="2. Press the home button to open instagram, click on the top right corner of the image you want to download, copy the link" :textWrap="true" class="text_line"/>
       <Label text="3. Then open this app, you will see the images" class="text_line"/>
