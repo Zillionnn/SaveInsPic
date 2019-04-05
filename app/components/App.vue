@@ -283,7 +283,7 @@ export default {
             console.log("Image saved successfully!");
           }
 
-          toast("save image success");
+          toast(`save to ${folder}`);
         })
         .catch(err => {
           toast(err);
@@ -315,7 +315,7 @@ export default {
       httpModule
         .getFile(insUrl, path)
         .then(r => {
-          toast("save video success");
+          toast(`save to ${folder}`);
         })
         .catch(err => {
           toast(err);
