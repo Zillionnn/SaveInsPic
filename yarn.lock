@@ -559,7 +559,7 @@
   resolved "https://registry.npmjs.org/@vue/devtools/-/devtools-5.0.0-beta.3.tgz#5f0b28db9f33681c8bb841887c28d523e91c9d06"
   dependencies:
     cross-spawn "^5.1.0"
-    electron "1.7.11"
+    electron ">=1.8.2-beta5"
     express "^4.16.2"
     ip "^1.1.5"
     socket.io "^2.0.4"
