@@ -15,7 +15,6 @@
       <Label text="2. 按home键，打开instagram，对需要下载的图片点击右上角，复制链接" :textWrap="true" class="text_line"/>
       <Label text="3. 打开本app，将会看到你需要的图片" :textWrap="true" class="text_line"/>
 
-      <Label text="https://github.com/Zillionnn" class="github"/>
     </StackLayout>
   </Page>
 </template>

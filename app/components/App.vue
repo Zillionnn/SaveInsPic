@@ -1,47 +1,23 @@
 <template>
   <Page>
     <ActionBar title="Save Instagram Pic">
-      <ActionItem
-        @tap="downLoadPic"
-        text="download all"
-        ios.systemIcon="16"
-        ios.position="right"
-        android.position="popup"
-      ></ActionItem>
-      <ActionItem
-        @tap="clearHis"
-        text="clear list"
-        ios.systemIcon="16"
-        ios.position="right"
-        android.position="popup"
-      ></ActionItem>
-      <ActionItem
-        @tap="goToAboutPage"
-        text="About"
-        ios.systemIcon="16"
-        ios.position="right"
-        android.position="popup"
-      ></ActionItem>
+      <ActionItem @tap="downLoadPic" text="download all" ios.systemIcon="16" ios.position="right"
+        android.position="popup"></ActionItem>
+      <ActionItem @tap="clearHis" text="clear list" ios.systemIcon="16" ios.position="right" android.position="popup">
+      </ActionItem>
+      <ActionItem @tap="goToAboutPage" text="About" ios.systemIcon="16" ios.position="right" android.position="popup">
+      </ActionItem>
     </ActionBar>
     <AbsoluteLayout ref="rootLayout">
-      <ListView
-        v-if="imgUrlList.length > 0"
-        for="item in imgUrlList"
-        @itemTap="onItemTap"
-        left="1.5%"
-        top="10"
-        right="1.5%"
-        height="97%"
-        width="98%"
-        marginBottom="48"
-      >
+      <ListView v-if="imgUrlList.length > 0" for="item in imgUrlList" @itemTap="onItemTap" left="1.5%" top="10"
+        right="1.5%" height="97%" width="98%" marginBottom="48">
         <v-template>
           <StackLayout orientation="horizontal">
-            <Image :src="item" stretch="aspectFill" width="100%" height="auto"/>
+            <Image :src="item" stretch="aspectFill" width="100%" height="auto" />
           </StackLayout>
         </v-template>
       </ListView>
-      <Label v-else text="The images will be displayed here" top="32" left="15"/>
+      <Label v-else text="The images will be displayed here" top="32" left="15" />
     </AbsoluteLayout>
   </Page>
 </template>
@@ -90,10 +66,10 @@ export default {
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
         "I need these permissions because I'm cool"
       )
-      .then(function() {
+      .then(function () {
         console.log("Woo Hoo, I have the power!");
       })
-      .catch(function() {
+      .catch(function () {
         console.log("Uh oh, no permissions - plan B time!");
       });
     const _self = this;
@@ -128,26 +104,26 @@ export default {
               // console.log("---------response---------\n", response);
               // console.log("------------response content--------------\n", str);
               const html = str
-            
-            let startString = '"graphql": '
-            let startIdx = html.search(startString)
 
-            let remain = html.substring(startIdx, html.length)
-            
-          let   remain1  = remain.substring(0, remain.length)
+              let startString = '"graphql": '
+              let startIdx = html.search(startString)
+
+              let remain = html.substring(startIdx, html.length)
+
+              let remain1 = remain.substring(0, remain.length)
 
 
 
-            const endIdx = remain1.search('</')
-            console.log(endIdx)
-            let jsonString = remain1.substring(startString.length, endIdx-9)
-            let shareObj = JSON.parse(jsonString)
-            console.log(shareObj.shortcode_media.display_resources)
-            
+              const endIdx = remain1.search('</')
+              console.log(endIdx)
+              let jsonString = remain1.substring(startString.length, endIdx - 9)
+              let shareObj = JSON.parse(jsonString)
+              console.log(shareObj.shortcode_media.display_resources)
+
               let multiMedia =
                 shareObj.entry_data.PostPage[0].graphql.shortcode_media
                   .edge_sidecar_to_children;
-                  // TODO
+              // TODO
               if (multiMedia) {
                 for (let i in multiMedia.edges) {
                   let item = multiMedia.edges[i];
@@ -182,7 +158,7 @@ export default {
               } else {
                 // 单张图，视频
 
-                let media =                  shareObj.shortcode_media;
+                let media = shareObj.shortcode_media;
                 // 单个视频 TODO
                 if (media.is_video) {
                   // 视频
@@ -213,7 +189,7 @@ export default {
                 }
               }
             },
-            e => {}
+            e => { }
           );
       });
     },
