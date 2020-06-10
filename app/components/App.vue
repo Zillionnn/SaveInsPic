@@ -127,20 +127,27 @@ export default {
               const str = response.content.toString();
               // console.log("---------response---------\n", response);
               // console.log("------------response content--------------\n", str);
-              let searchStr = "window._sharedData = ";
-              let _sharedDataStartPosition = str.search(searchStr);
-              console.log(_sharedDataStartPosition);
-              let st = _sharedDataStartPosition + searchStr.length;
-              console.log(st);
-              let tempStr = str.substr(st, str.length);
-              let end = tempStr.search("</");
-              console.log(end);
-              let objStr = tempStr.substring(0, end - 1);
-              console.log(objStr[objStr.length - 1]);
-              let shareObj = JSON.parse(objStr);
+              const html = str
+            
+            let startString = '"graphql": '
+            let startIdx = html.search(startString)
+
+            let remain = html.substring(startIdx, html.length)
+            
+          let   remain1  = remain.substring(0, remain.length)
+
+
+
+            const endIdx = remain1.search('</')
+            console.log(endIdx)
+            let jsonString = remain1.substring(startString.length, endIdx-9)
+            let shareObj = JSON.parse(jsonString)
+            console.log(shareObj.shortcode_media.display_resources)
+            
               let multiMedia =
                 shareObj.entry_data.PostPage[0].graphql.shortcode_media
                   .edge_sidecar_to_children;
+                  // TODO
               if (multiMedia) {
                 for (let i in multiMedia.edges) {
                   let item = multiMedia.edges[i];
@@ -175,9 +182,8 @@ export default {
               } else {
                 // 单张图，视频
 
-                let media =
-                  shareObj.entry_data.PostPage[0].graphql.shortcode_media;
-                // 单个视频
+                let media =                  shareObj.shortcode_media;
+                // 单个视频 TODO
                 if (media.is_video) {
                   // 视频
                   let videoUrl = media.video_url;
@@ -193,7 +199,7 @@ export default {
                   }
                 } else {
                   // 图片
-                  let displayUrl = media.display_url;
+                  let displayUrl = media.display_resources[0].src;
                   console.log(displayUrl);
 
                   if (this.imgUrlList.indexOf(displayUrl) === -1) {
