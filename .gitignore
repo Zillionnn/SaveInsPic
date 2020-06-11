@@ -8,3 +8,5 @@ node_modules
 hooks
 platforms
 yarn.lock
+*.keystore
+*.apk
