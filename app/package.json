@@ -1,8 +1,0 @@
-{
-  "android": {
-    "v8Flags": "--expose_gc"
-  },
-  "main": "main",
-  "name": "nts_demo3_vuecli",
-  "version": "1.0.0"
-}
